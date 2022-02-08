@@ -66,21 +66,23 @@ pub struct Graph<V, E> {
     pub data: HashMap<usize, (Option<V>, HashMap<usize, Vec<Option<E>>>)>,
     // HashMap<vertex2_id, HashSet<vertex_id>>
     // - saves some info about edges to current vertex for providing best asymptotics of methods
-    pub reversed_edges: HashMap<usize, HashSet<usize>>
+    pub reversed_edges: HashMap<usize, HashSet<usize>>,
+    last_vertex_id: usize
 }
 
 impl<V, E> Graph<V, E> {
     pub fn new() -> Self {
         Graph {
             data: HashMap::new(),
-            reversed_edges: HashMap::new()
+            reversed_edges: HashMap::new(),
+            last_vertex_id: 0
         }
     }
 
     pub fn add_vertex(&mut self, label: V) {
-        let new_vertex_id: usize = self.data.len() + 1;
-        self.data.insert(new_vertex_id, (Some(label), HashMap::new()));
-        self.reversed_edges.insert(new_vertex_id, HashSet::new());
+        self.last_vertex_id = self.last_vertex_id + 1;
+        self.data.insert(self.last_vertex_id, (Some(label), HashMap::new()));
+        self.reversed_edges.insert(self.last_vertex_id, HashSet::new());
     }
 
     pub fn remove_vertex(&mut self, id: &usize) {
@@ -183,6 +185,8 @@ impl<V, E> Graph<V, E> {
                     .map(|(id2, e_label_o_vec)| (new_ids[id2], e_label_o_vec.clone()))
                     .collect())))
                 .collect();
+
+        self.last_vertex_id = self.data.len();
     }
 
     pub fn get_vertices_vec(&self) -> Vec<(&usize, &Option<V>)>{
@@ -258,9 +262,12 @@ impl Graph <String, String> {
             reversed_edges.get_mut(&id2).map(|ids| ids.insert(id1));
         });
 
+        let last_vertex_id: usize = data.len();
+
         Graph {
             data,
-            reversed_edges
+            reversed_edges,
+            last_vertex_id
         }
     }
 
