@@ -127,14 +127,14 @@ impl<V, E> Graph<V, E> {
         };
     }
 
-    pub fn remove_edge(&mut self, from_id: &usize, to_id: &usize, label: E) where E: Clone + std::cmp::PartialEq {
+    pub fn remove_edge(&mut self, from_id: &usize, to_id: &usize, label: E) where E: std::cmp::PartialEq {
         match self.data.get_mut(from_id) {
             Some((_, edges)) => {
                 match self.reversed_edges.get_mut(to_id) {
                     Some(r_edges) =>
                         match edges.get_mut(to_id) {
                             Some(e_labels_o_vec) => {
-                                let index = e_labels_o_vec.iter().position(|r| r.clone() == Some(label.clone())).unwrap_or(e_labels_o_vec.len());
+                                let index = e_labels_o_vec.iter().position(|r| r.as_ref() == Some(&label)).unwrap_or(e_labels_o_vec.len());
                                 if index == e_labels_o_vec.len() {
                                     println!("\nThere is no edge between vertices {} and {} with this label", from_id, to_id);
                                 } else {
