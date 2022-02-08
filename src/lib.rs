@@ -46,8 +46,9 @@ mod tests {
         g.remove_edge(&2, &5, String::new());
         g.remove_edge(&5, &2, String::from("hhhhhh"));
         g.remove_vertex(&4);
+        g.add_vertex("646".to_string());
         assert_eq!(g.serialize_to_tgf(),
-                   "1 0\n2 1\n3 4\n#\n2 1 7777\n3 1 555\n");
+                   "1 0\n2 1\n3 4\n4 646\n#\n2 1 7777\n3 1 555\n");
     }
     #[test]
     fn test7() {
@@ -63,10 +64,10 @@ mod tests {
 
 pub struct Graph<V, E> {
     // HashMap<vertex_id, (vertex_label, HashMap<vertex2_id, edges_labels>)>
-    pub data: HashMap<usize, (Option<V>, HashMap<usize, Vec<Option<E>>>)>,
+    data: HashMap<usize, (Option<V>, HashMap<usize, Vec<Option<E>>>)>,
     // HashMap<vertex2_id, HashSet<vertex_id>>
     // - saves some info about edges to current vertex for providing best asymptotics of methods
-    pub reversed_edges: HashMap<usize, HashSet<usize>>,
+    reversed_edges: HashMap<usize, HashSet<usize>>,
     last_vertex_id: usize
 }
 
@@ -79,10 +80,11 @@ impl<V, E> Graph<V, E> {
         }
     }
 
-    pub fn add_vertex(&mut self, label: V) {
+    pub fn add_vertex(&mut self, label: V) -> usize {
         self.last_vertex_id = self.last_vertex_id + 1;
         self.data.insert(self.last_vertex_id, (Some(label), HashMap::new()));
         self.reversed_edges.insert(self.last_vertex_id, HashSet::new());
+        self.last_vertex_id
     }
 
     pub fn remove_vertex(&mut self, id: &usize) {
