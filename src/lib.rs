@@ -79,7 +79,7 @@ impl<V, E> Graph<V, E> {
             last_vertex_id: 0
         }
     }
-
+    // returns id of new vertex
     pub fn add_vertex(&mut self, label: V) -> usize {
         self.last_vertex_id = self.last_vertex_id + 1;
         self.data.insert(self.last_vertex_id, (Some(label), HashMap::new()));
@@ -116,7 +116,6 @@ impl<V, E> Graph<V, E> {
             Some((_, edges)) =>
                 match self.reversed_edges.get_mut(to_id) {
                     Some(r_edges) => {
-                        //edges.insert(*to_id, Some(label));
                         match edges.get_mut(to_id) {
                             Some(e_labels_o_vec) => e_labels_o_vec.push(Some(label)),
                             None => {
@@ -336,13 +335,12 @@ impl Graph <String, String> {
             Ok(_) => println!("successfully written to {}", display),
         }
     }
-    // depth-first search
-    fn dfs (id: &usize, data: &HashMap<usize, (Option<String>, HashMap<usize, Vec<Option<String>>>)>, used: &mut HashMap<&usize, bool>) {
-        used.get_mut(id).map(|is_used| *is_used = true);
+
+    fn display_vertex_info(graph: &Graph<String, String>, id: &usize) {
         println!(
             "id: {}, label: {}\nadjacent vertices: {:?}\n",
             id,
-            match data.get(id) {
+            match graph.data.get(id) {
                 Some((v_label_o, _)) =>
                     match v_label_o {
                         Some(v_label) => v_label.clone(),
@@ -350,7 +348,7 @@ impl Graph <String, String> {
                     },
                 None => String::new()
             },
-            match data.get(id) {
+            match graph.data.get(id) {
                 Some((_, edges)) => {
                     edges.iter()
                         .map(|(id2, e_labels_o_vec)| (id2, e_labels_o_vec.len()))
@@ -359,17 +357,23 @@ impl Graph <String, String> {
                 None => [].to_vec()
             }
         );
-        for (_, edges) in data.get(id) {
+    }
+
+    // depth-first search
+    fn dfs (&self, id: &usize, used: &mut HashMap<&usize, bool>, func: fn(&Graph<String, String>, &usize)) {
+        used.get_mut(id).map(|is_used| *is_used = true);
+        func(&self, id);
+        for (_, edges) in self.data.get(id) {
             for id2 in edges.keys() {
                 match used[id2] {
                     true => continue,
-                    false => Graph::<String, String>::dfs(id2, data, used)
+                    false => self.dfs(id2, used, func)
                 };
             }
         }
     }
     // displaying info about every vertex in format:
-    // id, label, [(second vertex id of edge, amount, amount of multiple edges),...]
+    // id, label, [(second vertex id of edge, amount of multiple edges),...]
     pub fn display (&self) {
         let mut used: HashMap<&usize, bool>  = self.data.iter()
             .map(|(id, _)| {
@@ -379,7 +383,7 @@ impl Graph <String, String> {
         for id in self.data.keys() {
             match used[id] {
                 true => continue,
-                false => Graph::<String, String>::dfs(id, &self.data, &mut used)
+                false => self.dfs(id, &mut used, Graph::<String, String>::display_vertex_info)
             };
         };
         print!("###THE END###\n");
