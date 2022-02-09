@@ -3,65 +3,6 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-#[cfg(test)]
-mod tests {
-    use crate::Graph;
-
-    #[test]
-    fn test1() {
-        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test1.tgf"));
-        assert_eq!(g.serialize_to_tgf(),
-                   "1 ROOT\n2 2\n3 3\n4 4\n5 5\n#\n1 2 \n1 3 \n2 4 \n2 5 \n");
-    }
-    #[test]
-    fn test2() {
-        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test2.tgf"));
-        assert_eq!(g.serialize_to_tgf(),
-                   "1 ROOT\n2 2\n3 3\n4 4\n5 5\n#\n");
-    }
-    #[test]
-    fn test3() {
-        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test3.tgf"));
-        assert_eq!(g.serialize_to_tgf(),
-                   "1 1\n2 2\n3 3\n4 \n5 5\n#\n2 1 edge\n2 3 tap\n2 3 tap\n2 4 \n3 5 \n4 3 32432\n4 5 \n5 1 \n5 3 ewrer\n");
-    }
-    #[test]
-    fn test4() {
-        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test4.tgf"));
-        g.add_edge(&2, &5, String::from("111"));
-        assert_eq!(g.serialize_to_tgf(),
-                   "1 ROOT\n2 2\n3 3\n4 4\n5 5\n#\n1 2 \n1 3 \n2 5 111\n2 5 111\n3 4 \n");
-    }
-    #[test]
-    fn test5() {
-        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test5.tgf"));
-        g.add_vertex(String::from("f"));
-        assert_eq!(g.serialize_to_tgf(),
-                   "1 f\n2 f\n3 f\n4 f\n5 f\n6 f\n#\n2 1 \n2 3 \n2 5 \n3 1 \n3 4 \n5 1 \n5 3 \n");
-    }
-    #[test]
-    fn test6() {
-        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test6.tgf"));
-        g.remove_vertex(&3);
-        g.remove_edge(&2, &5, String::new());
-        g.remove_edge(&5, &2, String::from("hhhhhh"));
-        g.remove_vertex(&4);
-        g.add_vertex("646".to_string());
-        assert_eq!(g.serialize_to_tgf(),
-                   "1 0\n2 1\n3 4\n4 646\n#\n2 1 7777\n3 1 555\n");
-    }
-    #[test]
-    fn test7() {
-        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test7.tgf"));
-        assert_eq!(g.serialize_to_tgf(), "#\n");
-    }
-    #[test]
-    fn test8() {
-        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test8.tgf"));
-        assert_eq!(g.serialize_to_tgf(), "#\n");
-    }
-}
-
 pub struct Graph<V, E> {
     // HashMap<vertex_id, (vertex_label, HashMap<vertex2_id, edges_labels>)>
     data: HashMap<usize, (Option<V>, HashMap<usize, Vec<Option<E>>>)>,
@@ -387,5 +328,64 @@ impl Graph <String, String> {
             };
         };
         print!("###THE END###\n");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::Graph;
+
+    #[test]
+    fn test1() {
+        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test1.tgf"));
+        assert_eq!(g.serialize_to_tgf(),
+                   "1 ROOT\n2 2\n3 3\n4 4\n5 5\n#\n1 2 \n1 3 \n2 4 \n2 5 \n");
+    }
+    #[test]
+    fn test2() {
+        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test2.tgf"));
+        assert_eq!(g.serialize_to_tgf(),
+                   "1 ROOT\n2 2\n3 3\n4 4\n5 5\n#\n");
+    }
+    #[test]
+    fn test3() {
+        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test3.tgf"));
+        assert_eq!(g.serialize_to_tgf(),
+                   "1 1\n2 2\n3 3\n4 \n5 5\n#\n2 1 edge\n2 3 tap\n2 3 tap\n2 4 \n3 5 \n4 3 32432\n4 5 \n5 1 \n5 3 ewrer\n");
+    }
+    #[test]
+    fn test4() {
+        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test4.tgf"));
+        g.add_edge(&2, &5, String::from("111"));
+        assert_eq!(g.serialize_to_tgf(),
+                   "1 ROOT\n2 2\n3 3\n4 4\n5 5\n#\n1 2 \n1 3 \n2 5 111\n2 5 111\n3 4 \n");
+    }
+    #[test]
+    fn test5() {
+        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test5.tgf"));
+        g.add_vertex(String::from("f"));
+        assert_eq!(g.serialize_to_tgf(),
+                   "1 f\n2 f\n3 f\n4 f\n5 f\n6 f\n#\n2 1 \n2 3 \n2 5 \n3 1 \n3 4 \n5 1 \n5 3 \n");
+    }
+    #[test]
+    fn test6() {
+        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test6.tgf"));
+        g.remove_vertex(&3);
+        g.remove_edge(&2, &5, String::new());
+        g.remove_edge(&5, &2, String::from("hhhhhh"));
+        g.remove_vertex(&4);
+        g.add_vertex("646".to_string());
+        assert_eq!(g.serialize_to_tgf(),
+                   "1 0\n2 1\n3 4\n4 646\n#\n2 1 7777\n3 1 555\n");
+    }
+    #[test]
+    fn test7() {
+        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test7.tgf"));
+        assert_eq!(g.serialize_to_tgf(), "#\n");
+    }
+    #[test]
+    fn test8() {
+        let mut g: Graph<String, String> = Graph::read_from_file(String::from("tests/test8.tgf"));
+        assert_eq!(g.serialize_to_tgf(), "#\n");
     }
 }
